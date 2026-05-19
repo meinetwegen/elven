@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="office">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Normal Text Editor</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <header class="toolbar">
+            <div class="toolbar-group">
+                <button id="toggle-theme" title="Change theme">🎇Magic🎇</button>
+            </div>
+            
+            <div class="toolbar-group formatting-tools">
+                <button onclick="format('bold')" title="Bold"><b>B</b></button>
+                <button onclick="format('italic')" title="Italic"><i>I</i></button>
+                <button onclick="format('underline')" title="Underlined"><u>U</u></button>
+                <button onclick="format('insertUnorderedList')" title="List">• List</button>
+            </div>
+
+            <div class="toolbar-group file-tools">
+                <button id="btn-save">💾 Save (.elven)</button>
+                <button id="btn-load-trigger">📂 Open (.elven)</button>
+                <button id="btn-pdf">📜 Export to PDF</button> <input type="file" id="file-input" accept=".elven" style="display: none;">
+            </div>
+            
+        </header>
+
+        <main class="editor-container">
+            <div id="editor" contenteditable="true" placeholder="Type..."></div>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script href="app.js" src="app.js"></script>
+</body>
+</html>
