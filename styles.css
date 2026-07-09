@@ -6,28 +6,28 @@
 /* --- Эльфийский шрифт: Tengwar Annatar, все начертания --- */
 @font-face {
     font-family: 'Tengwar';
-    src: url('assets/tngan.ttf') format('truetype');
+    src: url('assets/fonts/tngan.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
 }
 @font-face {
     font-family: 'Tengwar';
-    src: url('assets/tnganb.ttf') format('truetype');
+    src: url('assets/fonts/tnganb.ttf') format('truetype');
     font-weight: bold;
     font-style: normal;
     font-display: swap;
 }
 @font-face {
     font-family: 'Tengwar';
-    src: url('assets/tngani.ttf') format('truetype');
+    src: url('assets/fonts/tngani.ttf') format('truetype');
     font-weight: normal;
     font-style: italic;
     font-display: swap;
 }
 @font-face {
     font-family: 'Tengwar';
-    src: url('assets/tnganbi.ttf') format('truetype');
+    src: url('assets/fonts/tnganbi.ttf') format('truetype');
     font-weight: bold;
     font-style: italic;
     font-display: swap;
