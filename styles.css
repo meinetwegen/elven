@@ -1,145 +1,555 @@
-/* Подключаем эльфийский шрифт */
+/* ==========================================================================
+   Elven Scroll — токены и стили
+   Две темы: "office" (обычный мир) и "elven" (мир свитков).
+   ========================================================================== */
+
+/* --- Эльфийский шрифт: Tengwar Annatar, все начертания --- */
 @font-face {
     font-family: 'Tengwar';
-    src: url('assets/tengwar.ttf') format('truetype');
+    src: url('assets/fonts/tngan.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Tengwar';
+    src: url('assets/fonts/tnganb.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Tengwar';
+    src: url('assets/fonts/tngani.ttf') format('truetype');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Tengwar';
+    src: url('assets/fonts/tnganbi.ttf') format('truetype');
+    font-weight: bold;
+    font-style: italic;
+    font-display: swap;
 }
 
-/* Переменные для Офисной (скучной) темы */
+/* --------------------------------------------------------------------------
+   Токены темы "office" — холодный, чуть электрический, деловой мир.
+   -------------------------------------------------------------------------- */
 [data-theme="office"] {
-    --bg-app: #f3f3f3;
+    --bg-app: #eef0f4;
     --bg-toolbar: #ffffff;
     --bg-editor: #ffffff;
-    --text-color: #333333;
-    --accent-color: #0078d4;
-    --border-color: #cccccc;
-    --font-editor: 'Arial', sans-serif;
-    --editor-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    --border-radius: 4px;
+    --ink: #1c2029;
+    --ink-soft: #6b7180;
+    --accent: #3452e1;
+    --accent-soft: rgba(52, 82, 225, 0.12);
+    --border-color: #dde0e8;
+    --font-ui: 'IBM Plex Sans', sans-serif;
+    --font-label: 'IBM Plex Mono', monospace;
+    --font-editor: 'IBM Plex Sans', sans-serif;
+    --editor-shadow: 0 1px 2px rgba(28, 32, 41, 0.04), 0 12px 32px -12px rgba(28, 32, 41, 0.14);
+    --border-radius: 6px;
+    --sheet-radius: 3px;
+    --seal-color: #3452e1;
 }
 
-/* Переменные для Эльфийской темы */
+/* --------------------------------------------------------------------------
+   Токены темы "elven" — тёмный мир пергамента, золота и рунного свечения.
+   -------------------------------------------------------------------------- */
 [data-theme="elven"] {
-    --bg-app: #1e1b15; /* Темный глубокий фон */
-    --bg-toolbar: #2d261d;
-    --bg-editor: #f4ecd8; /* Пергаментный цвет для листа */
-    --text-color: #107d9e;
-    --accent-color: #8c6d3d;
-    --border-color: #5c4a33;
-    --font-editor: 'Tengwar', serif; /* Текст становится эльфийским! */
-    --editor-shadow: 0 0 20px rgba(140, 109, 61, 0.3);
-    --border-radius: 12px;
+    --bg-app: #120d07;
+    --bg-toolbar: #1c150c;
+    --bg-editor: #ecdcb4;
+    --ink: #0e7490;
+    --ink-soft: #7a6438;
+    --accent: #c99a4a;
+    --accent-soft: rgba(201, 154, 74, 0.16);
+    --border-color: #4a3b22;
+    --font-ui: 'Cinzel', serif;
+    --font-label: 'Cinzel', serif;
+    --font-editor: 'Tengwar', serif;
+    --editor-shadow: 0 0 0 1px rgba(201, 154, 74, 0.25), 0 0 60px -8px rgba(226, 166, 75, 0.35);
+    --border-radius: 2px;
+    --sheet-radius: 0px;
+    --seal-color: #e2a64b;
 }
 
+/* ==========================================================================
+   Reset & base
+   ========================================================================== */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    transition: background 0.3s, color 0.3s, font-family 0.3s;
+}
+
+html {
+    color-scheme: light;
 }
 
 body {
     background-color: var(--bg-app);
-    color: var(--text-color);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--ink);
+    font-family: var(--font-ui);
     height: 100vh;
+    overflow: hidden;
+    transition: background-color 0.6s ease, color 0.6s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
 
 .app-container {
     display: flex;
     flex-direction: column;
     height: 100%;
+    position: relative;
+    z-index: 1;
 }
 
-/* Панель инструментов */
+/* Показываем/прячем подписи под тему через data-office / data-elven */
+[data-office][data-elven] { position: relative; }
+html[data-theme="office"] [data-elven]:not([data-office=""]) { }
+[data-theme="office"] [data-office] { }
+
+/* Универсальный переключатель контента по теме (используется в JS, но
+   держим safety net на чистом CSS через atomic classes ниже) */
+
+/* ==========================================================================
+   Toolbar
+   ========================================================================== */
 .toolbar {
     background-color: var(--bg-toolbar);
     border-bottom: 1px solid var(--border-color);
-    padding: 10px 20px;
+    padding: 12px 22px;
     display: flex;
-    gap: 20px;
+    gap: 22px;
     align-items: center;
+    transition: background-color 0.6s ease, border-color 0.6s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.toolbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-right: 18px;
+    border-right: 1px solid var(--border-color);
+}
+
+.brand-mark {
+    color: var(--accent);
+    display: flex;
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+}
+
+.brand-title {
+    font-family: var(--font-label);
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.03em;
+}
+
+[data-theme="elven"] .brand-title {
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 13px;
+}
+
+.brand-subtitle {
+    font-family: var(--font-label);
+    font-size: 11px;
+    color: var(--ink-soft);
+    letter-spacing: 0.02em;
 }
 
 .toolbar-group {
     display: flex;
-    gap: 5px;
+    gap: 4px;
 }
 
-button {
+.formatting-tools {
+    padding-right: 18px;
+    border-right: 1px solid var(--border-color);
+}
+
+.file-tools {
+    margin-left: auto;
+}
+
+/* Buttons ------------------------------------------------------------- */
+.tool-btn {
     background: transparent;
-    border: 1px solid var(--border-color);
-    color: inherit;
-    padding: 6px 12px;
+    border: 1px solid transparent;
+    color: var(--ink);
+    padding: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
     cursor: pointer;
     border-radius: var(--border-radius);
-    font-size: 14px;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    line-height: 1;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-button:hover {
-    background-color: rgba(140, 109, 61, 0.1);
-    border-color: var(--accent-color);
+.tool-btn--labeled {
+    padding: 8px 12px;
 }
 
-/* Контейнер для листа */
+.tool-btn svg {
+    flex-shrink: 0;
+}
+
+.tool-btn:hover {
+    background-color: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.tool-btn:active {
+    transform: translateY(1px);
+}
+
+.tool-btn:focus-visible,
+.seal-btn:focus-visible,
+.modal-btn:focus-visible,
+#modal-input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+[data-theme="elven"] .tool-btn--labeled span {
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+}
+
+/* Seal toggle ----------------------------------------------------------- */
+.seal-btn {
+    background: transparent;
+    border: none;
+    color: var(--seal-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    border-radius: 50%;
+    transition: color 0.6s ease, transform 0.3s ease;
+}
+
+.seal-btn:hover {
+    transform: rotate(18deg) scale(1.06);
+}
+
+.seal-btn:active {
+    transform: rotate(18deg) scale(0.94);
+}
+
+.seal-ring {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.2;
+    opacity: 0.55;
+}
+
+.seal-glyph {
+    color: currentColor;
+}
+
+/* ==========================================================================
+   Editor
+   ========================================================================== */
 .editor-container {
     flex: 1;
     overflow-y: auto;
-    padding: 40px 20px;
+    padding: 48px 20px 88px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
 }
 
-/* Лист бумаги а-ля Word */
+.editor-sheet {
+    width: 100%;
+    max-width: 760px;
+    filter: drop-shadow(0 0 0 transparent);
+}
+
 #editor {
     background-color: var(--bg-editor);
     font-family: var(--font-editor);
-    color: var(--text-color);
+    color: var(--ink);
     width: 100%;
-    max-width: 800px;
-    min-height: 500px;
-    padding: 40px;
+    min-height: 560px;
+    padding: 56px 60px;
     border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
+    border-radius: var(--sheet-radius);
     box-shadow: var(--editor-shadow);
     outline: none;
     font-size: 18px;
-    line-height: 1.6;
+    line-height: 1.7;
+    transition: background-color 0.6s ease, color 0.6s ease, border-color 0.6s ease, box-shadow 0.6s ease, border-radius 0.6s ease, padding 0.6s ease;
 }
 
-/* Плейсхолдер для пустого редактора */
+[data-theme="elven"] #editor {
+    font-size: 22px;
+    line-height: 2;
+    background-image:
+        radial-gradient(ellipse at 12% 8%, rgba(122, 100, 56, 0.10), transparent 55%),
+        radial-gradient(ellipse at 88% 92%, rgba(122, 100, 56, 0.10), transparent 55%);
+}
+
 #editor:empty:before {
-    content: attr(placeholder);
-    color: #999;
-    font-family: 'Arial', sans-serif;
+    content: attr(data-placeholder-office);
+    color: var(--ink-soft);
+    font-family: var(--font-ui);
+    font-size: 16px;
 }
-/* 1. Обычный эльфийский шрифт */
-@font-face {
-    font-family: 'Tengwar';
-    src: url('assets/tngan.ttf') format('truetype');
-    font-weight: normal;
+
+[data-theme="elven"] #editor:empty:before {
+    content: attr(data-placeholder-elven);
+    font-family: 'Cinzel', serif;
     font-style: normal;
+    letter-spacing: 0.03em;
 }
 
-/* 2. Жирный эльфийский */
-@font-face {
-    font-family: 'Tengwar';
-    src: url('assets/tnganb.ttf') format('truetype');
-    font-weight: bold;
-    font-style: normal;
+.status-bar {
+    width: 100%;
+    max-width: 760px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-label);
+    font-size: 11px;
+    color: var(--ink-soft);
+    letter-spacing: 0.03em;
+    padding: 0 4px;
 }
 
-/* 3. Эльфийский курсив */
-@font-face {
-    font-family: 'Tengwar';
-    src: url('assets/tngani.ttf') format('truetype');
-    font-weight: normal;
-    font-style: italic;
+[data-theme="elven"] .status-bar {
+    color: #a08a52;
+    text-transform: uppercase;
 }
 
-/* 4. Жирный эльфийский курсив */
-@font-face {
-    font-family: 'Tengwar';
-    src: url('assets/tnganbi.ttf') format('truetype');
-    font-weight: bold;
-    font-style: italic;
+.status-dot { opacity: 0.5; }
+
+/* ==========================================================================
+   Modal (замена window.prompt)
+   ========================================================================== */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 8, 4, 0.55);
+    backdrop-filter: blur(3px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    animation: fade-in 0.18s ease;
+}
+
+.modal-overlay[hidden] { display: none; }
+
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-card {
+    background: var(--bg-toolbar);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 26px 26px 22px;
+    width: 320px;
+    box-shadow: 0 24px 60px -20px rgba(0,0,0,0.35);
+    animation: pop-in 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+@keyframes pop-in {
+    from { opacity: 0; transform: translateY(6px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-card h2 {
+    font-family: var(--font-label);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 6px;
+}
+
+[data-theme="elven"] .modal-card h2 {
+    font-family: 'Cinzel', serif;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.modal-subtitle {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+
+#modal-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--bg-app);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    margin-bottom: 18px;
+}
+
+#modal-input:focus { border-color: var(--accent); }
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.modal-btn {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    padding: 8px 14px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.modal-btn--ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border-color: var(--border-color);
+}
+
+.modal-btn--ghost:hover { color: var(--ink); }
+
+.modal-btn--primary {
+    background: var(--accent);
+    color: #fff;
+}
+
+[data-theme="elven"] .modal-btn--primary { color: #1c150c; }
+
+.modal-btn--primary:hover { filter: brightness(1.08); }
+
+/* ==========================================================================
+   Toasts (замена window.alert)
+   ========================================================================== */
+.toast-stack {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 60;
+}
+
+.toast {
+    background: var(--bg-toolbar);
+    border: 1px solid var(--border-color);
+    border-left: 3px solid var(--accent);
+    color: var(--ink);
+    padding: 11px 16px;
+    border-radius: var(--border-radius);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    max-width: 320px;
+    box-shadow: 0 12px 30px -12px rgba(0,0,0,0.25);
+    animation: toast-in 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+.toast--error { border-left-color: #d1453c; }
+
+@keyframes toast-in {
+    from { opacity: 0; transform: translateX(12px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.toast.toast--leaving {
+    animation: toast-out 0.2s ease forwards;
+}
+
+@keyframes toast-out {
+    to { opacity: 0; transform: translateX(12px); }
+}
+
+/* ==========================================================================
+   Signature transition: "the seal breaks" — a radial wipe from the seal
+   button, plus a brief drift of embers, when crossing between worlds.
+   ========================================================================== */
+#seal-wipe {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 40;
+    background: var(--wipe-color, #120d07);
+    clip-path: circle(0% at var(--wipe-x, 90%) var(--wipe-y, 5%));
+}
+
+#seal-wipe.is-active {
+    animation: seal-wipe-anim 0.7s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+@keyframes seal-wipe-anim {
+    0%   { clip-path: circle(0% at var(--wipe-x, 90%) var(--wipe-y, 5%)); }
+    55%  { clip-path: circle(140% at var(--wipe-x, 90%) var(--wipe-y, 5%)); }
+    100% { clip-path: circle(140% at var(--wipe-x, 90%) var(--wipe-y, 5%)); opacity: 0; }
+}
+
+#ember-field {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 41;
+    opacity: 0;
+}
+
+#ember-field.is-active {
+    opacity: 1;
+    transition: opacity 0.4s ease;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width: 720px) {
+    .toolbar {
+        flex-wrap: wrap;
+        row-gap: 10px;
+        padding: 12px 14px;
+    }
+    .toolbar-brand {
+        border-right: none;
+        padding-right: 0;
+        flex: 1 1 auto;
+    }
+    .formatting-tools {
+        border-right: none;
+        padding-right: 0;
+    }
+    .file-tools {
+        margin-left: 0;
+    }
+    .tool-btn--labeled span { display: none; }
+    #editor {
+        padding: 32px 22px;
+    }
 }
